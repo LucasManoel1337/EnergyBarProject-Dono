@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <!-- Changelog para a criação da tabela compras -->
+    <changeSet author="lucas" id="134509022025">
+    <createTable tableName="tb_compras">
+        <column name="id" type="INT" autoIncrement="true">
+            <constraints primaryKey="true" nullable="false"/>
+        </column>
+        <column name="data_compra" type="DATETIME">
+            <constraints nullable="false"/>
+        </column>
+        <column name="funcionario" type="VARCHAR(255)">
+            <constraints nullable="false"/>
+        </column>
+        <column name="tipo_cliente" type="VARCHAR(100)">
+            <constraints nullable="false"/>
+        </column>
+        <column name="forma_pagamento" type="VARCHAR(100)">
+            <constraints nullable="false"/>
+        </column>
+        <column name="desconto" type="DECIMAL(10,2)">
+            <constraints nullable="false"/>
+        </column>
+        <column name="valor_total" type="DECIMAL(10,2)">
+            <constraints nullable="false"/>
+        </column>
+        <column name="compra_unidade" type="INT">
+            <constraints nullable="false"/>
+        </column>
+    </createTable>
+</changeSet>
+
+</databaseChangeLog>

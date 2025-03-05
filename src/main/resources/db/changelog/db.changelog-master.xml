@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+
+    <include file="db/changelog/tb_produtos.xml"/>
+    <include file="db/changelog/tb_compras.xml"/>
+    <include file="db/changelog/tb_produtos_compras.xml"/>
+    <include file="db/changelog/tb_lucros_liquidos.xml"/>
+    <include file="db/changelog/tb_lucros_brutos.xml"/>
+    <include file="db/changelog/tb_valor_de_estoque.xml"/>
+    <include file="db/changelog/tb_funcionarios.xml"/>
+    <include file="db/changelog/tb_unidades.xml"/>
+    <include file="db/changelog/tb_catalogo.xml"/>
+
+</databaseChangeLog>

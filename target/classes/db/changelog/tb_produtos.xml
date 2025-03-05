@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.5.xsd">
+
+    <changeSet id="134409022025" author="lucas">
+        <createTable tableName="tb_produtos">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" unique="true"/>
+            </column>
+            <column name="id_produto" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="nome" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="responsavel" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="estoque" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="validade" type="VARCHAR(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="valor_custo" type="DECIMAL(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="valor_venda" type="DECIMAL(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="lote" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="data_cadastro" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="produto_unidade" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
