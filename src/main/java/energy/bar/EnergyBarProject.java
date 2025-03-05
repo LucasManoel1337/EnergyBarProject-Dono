@@ -13,7 +13,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import energy.bar.db.GeradorDeProdutos;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -23,12 +22,9 @@ import javax.swing.JOptionPane;
 public class EnergyBarProject {
     
     private String versaoPrograma = "0.8.9";
-    private static boolean gerarDados = false;
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss - dd-MM-yyyy");
     String dataHoraAtual = LocalDateTime.now().format(formatter);
-
-    GeradorDeProdutos ger = new GeradorDeProdutos();
 
     private TelaHistoricoCompra telaHistoricoCompra;
     private TelaSaidas telaSaidas;
@@ -197,6 +193,8 @@ public class EnergyBarProject {
             telaGerenciarFuncionarios.atualizarTabelaFuncionarios();
         } if (novaTela instanceof TelaGerenciarUnidades) {
             telaGerenciarUnidades.atualizarTabelaUnidades();
+        } if (novaTela instanceof TelaRelatorios) {
+            telaRelatorios.carregarTodosProdutos();
         }
     }
 
@@ -225,9 +223,6 @@ public class EnergyBarProject {
             System.out.println("[" + dataHoraAtual + "] - [EnergyBarApp.java] - Conexao estabelecida com sucesso!");
             System.out.println("[" + dataHoraAtual + "] - [EnergyBarApp.java] - Inicializando sistema.");
 
-            if (gerarDados == true) {
-                GeradorDeProdutos.gerarProdutosDeTeste();
-            }
 
             new EnergyBarProject();
 

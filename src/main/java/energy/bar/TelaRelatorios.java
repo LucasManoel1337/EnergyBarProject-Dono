@@ -17,7 +17,7 @@ import energy.bar.support.QuantidadeCellRenderer;
 class TelaRelatorios extends JPanel {
 
     LabelEnergyBar labelEnergyBar = new LabelEnergyBar();
-    String[] colunas = {"ID", "Produto", "Qnt"};
+    String[] colunas = {"ID", "Produto", "Qnt", "Lucro Bruto"};
     DefaultTableModel modeloTabela = new DefaultTableModel(colunas, 0);
     public JTable tabelaProdutos = new JTable(modeloTabela);
     public JTextField campoNome = new JTextField();
@@ -76,7 +76,7 @@ class TelaRelatorios extends JPanel {
         });
 
         JScrollPane scrollPane = new JScrollPane(tabelaProdutos);
-        scrollPane.setBounds(10, 70, 400, 480);
+        scrollPane.setBounds(10, 70, 500, 480);
         scrollPane.setBorder(BorderFactory.createLineBorder(new Color(220, 220, 220), 2));
         add(scrollPane);
 
@@ -86,35 +86,41 @@ class TelaRelatorios extends JPanel {
         // Adiciona o renderer para a coluna de quantidade
         tabelaProdutos.getColumnModel().getColumn(2).setCellRenderer(new QuantidadeCellRenderer());
 
+        tabelaProdutos.getColumnModel().getColumn(3).setPreferredWidth(70);
+
         carregarTodosProdutos();
     }
 
     public void carregarTodosProdutos() {
-        String sql = "SELECT c.id AS produto_id, c.produto AS produto_nome, "
-                + "COALESCE(SUM(pc.quantidade), 0) AS total_qnt "
-                + "FROM tb_catalogo c "
-                + "LEFT JOIN tb_produtos_compras pc ON c.id = pc.produto_id "
-                + "GROUP BY c.id, c.produto";
+    String sql = "SELECT c.id AS produto_id, c.produto AS produto_nome, "
+               + "COALESCE(SUM(pc.quantidade), 0) AS total_qnt, "
+               + "COALESCE(SUM(pc.quantidade * pc.preco_unitario), 0) AS receita_total, "
+               + "COALESCE(SUM(pc.quantidade * pc.preco_unitario), 0) AS lucro_bruto "
+               + "FROM tb_catalogo c "
+               + "LEFT JOIN tb_produtos_compras pc ON c.id = pc.produto_id "
+               + "GROUP BY c.id, c.produto";
 
-        try (Connection conn = b.getConnection(); // Usa sua conexão existente
-                 PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+    try (Connection conn = b.getConnection(); // Usa sua conexão existente
+         PreparedStatement stmt = conn.prepareStatement(sql);
+         ResultSet rs = stmt.executeQuery()) {
 
-            modeloTabela.setRowCount(0); // Limpa a tabela antes de inserir novos dados
+        modeloTabela.setRowCount(0); // Limpa a tabela antes de inserir novos dados
 
-            while (rs.next()) {
-                int id = rs.getInt("produto_id");
-                String produto = rs.getString("produto_nome");
-                int quantidade = rs.getInt("total_qnt"); // Se não existir na tb_produtos_compras, será 0
+        while (rs.next()) {
+            int id = rs.getInt("produto_id");
+            String produto = rs.getString("produto_nome");
+            int quantidade = rs.getInt("total_qnt");
+            double receitaTotal = rs.getDouble("receita_total");
+            double lucroBruto = rs.getDouble("lucro_bruto");
 
-                modeloTabela.addRow(new Object[]{id, produto, quantidade});
-            }
-
-            System.out.println("Produtos do catálogo carregados com sucesso!");
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Erro ao carregar produtos do catálogo.", "Erro", JOptionPane.ERROR_MESSAGE);
+            modeloTabela.addRow(new Object[]{id, produto, quantidade, "R$ "+receitaTotal, lucroBruto});
         }
-    }
 
+        System.out.println("Produtos do catálogo carregados com sucesso!");
+
+    } catch (Exception ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Erro ao carregar produtos do catálogo.", "Erro", JOptionPane.ERROR_MESSAGE);
+    }
+}
 }

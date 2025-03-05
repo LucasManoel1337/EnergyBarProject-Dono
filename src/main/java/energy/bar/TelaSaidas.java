@@ -3,17 +3,13 @@ package energy.bar;
 import energy.bar.back.dao.FuncionariosDAO;
 import energy.bar.db.ConexaoBancoDeDados;
 import energy.bar.support.LabelEnergyBar;
-import energy.bar.support.Produto;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.List;
 
 class TelaSaidas extends JPanel {
 
@@ -129,22 +125,26 @@ class TelaSaidas extends JPanel {
     }
 
     public void carregarUnidades() {
-        try (Connection conn = ConexaoBancoDeDados.getConnection()) {
-            String query = "SELECT id FROM tb_unidades";
-            try (PreparedStatement stmt = conn.prepareStatement(query)) {
-                ResultSet rs = stmt.executeQuery();
+    try (Connection conn = ConexaoBancoDeDados.getConnection()) {
+        String query = "SELECT id FROM tb_unidades";
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            ResultSet rs = stmt.executeQuery();
 
-                while (rs.next()) {
-                    int id = rs.getInt("id");
-                    unidadesIds.add(String.valueOf(id));
-                }
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                unidadesIds.add(String.valueOf(id));
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+            
+            if (unidadesIds.isEmpty()) { //PROVISORIO
+                unidadesIds.add("0"); //PROVISORIO
+            } //PROVISORIO
         }
-
-        campoUnidade = new JComboBox<>(unidadesIds.toArray(new String[0]));
+    } catch (SQLException ex) {
+        ex.printStackTrace();
     }
+
+    campoUnidade = new JComboBox<>(unidadesIds.toArray(new String[0]));
+}
 
     private void adicionarPlaceholder(JTextField campo, String textoPlaceholder) {
         campo.setText(textoPlaceholder);
@@ -177,104 +177,104 @@ class TelaSaidas extends JPanel {
     }
 
     private void listarHistoricoDeCompras(JPanel painel) {
-    painel.removeAll(); // Limpa o painel antes de adicionar novos elementos
-    try (Connection conn = ConexaoBancoDeDados.getConnection()) {
-        String sql;
-        PreparedStatement stmt;
+        painel.removeAll(); // Limpa o painel antes de adicionar novos elementos
+        try (Connection conn = ConexaoBancoDeDados.getConnection()) {
+            String sql;
+            PreparedStatement stmt;
 
-        LocalDateTime dataInicio = obterDataDoCampo(campoDataInicio);
-        LocalDateTime dataFim = obterDataDoCampo(campoDataFim);
-        int unidadeDoPrograma = Integer.parseInt(campoUnidade.getSelectedItem().toString());
+            LocalDateTime dataInicio = obterDataDoCampo(campoDataInicio);
+            LocalDateTime dataFim = obterDataDoCampo(campoDataFim);
+            int unidadeDoPrograma = Integer.parseInt(campoUnidade.getSelectedItem().toString());
 
-        // Verifica se as datas foram fornecidas e aplica o filtro
-        if (dataInicio != null && dataFim != null) {
-            // Se houver data, o SQL deve filtrar pela data e pela unidade
-            sql = "SELECT c.id AS compra_id, c.data_compra, c.funcionario, c.tipo_cliente, c.forma_pagamento, c.desconto, c.valor_total "
-                    + "FROM tb_compras c "
-                    + "WHERE c.data_compra BETWEEN ? AND ? "
-                    + "AND c.compra_unidade = ?";
-            stmt = conn.prepareStatement(sql);
-            stmt.setTimestamp(1, Timestamp.valueOf(dataInicio));
-            stmt.setTimestamp(2, Timestamp.valueOf(dataFim));
-            stmt.setInt(3, unidadeDoPrograma);
-        } else {
-            // Se não houver datas, filtra apenas pela unidade
-            sql = "SELECT c.id AS compra_id, c.data_compra, c.funcionario, c.tipo_cliente, c.forma_pagamento, c.desconto, c.valor_total "
-                    + "FROM tb_compras c "
-                    + "WHERE c.compra_unidade = ?";
-            stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, unidadeDoPrograma);
+            // Verifica se as datas foram fornecidas e aplica o filtro
+            if (dataInicio != null && dataFim != null) {
+                // Se houver data, o SQL deve filtrar pela data e pela unidade
+                sql = "SELECT c.id AS compra_id, c.data_compra, c.funcionario, c.tipo_cliente, c.forma_pagamento, c.desconto, c.valor_total "
+                        + "FROM tb_compras c "
+                        + "WHERE c.data_compra BETWEEN ? AND ? "
+                        + "AND c.compra_unidade = ?"; // SQL com filtro por unidade
+                stmt = conn.prepareStatement(sql);
+                stmt.setTimestamp(1, Timestamp.valueOf(dataInicio));
+                stmt.setTimestamp(2, Timestamp.valueOf(dataFim));
+                stmt.setInt(3, unidadeDoPrograma);
+            } else {
+                // Se não houver datas, filtra apenas pela unidade
+                sql = "SELECT c.id AS compra_id, c.data_compra, c.funcionario, c.tipo_cliente, c.forma_pagamento, c.desconto, c.valor_total "
+                        + "FROM tb_compras c "
+                        + "WHERE c.compra_unidade = ?"; // SQL com filtro por unidade
+                stmt = conn.prepareStatement(sql);
+                stmt.setInt(1, unidadeDoPrograma);
+            }
+
+            ResultSet rs = stmt.executeQuery();
+            int y = 10;
+            double total = 0;
+
+            while (rs.next()) {
+                int compraId = rs.getInt("compra_id");
+                String dataCompra = rs.getString("data_compra");
+                String funcionarioNome = rs.getString("funcionario");
+                String tipoCliente = rs.getString("tipo_cliente");
+                String formaPagamento = rs.getString("forma_pagamento");
+                String desconto = rs.getString("desconto");
+                String valorTotal = rs.getString("valor_total");
+                total += Double.parseDouble(valorTotal);
+
+                JTextField txtDataCompra = new JTextField(dataCompra);
+                txtDataCompra.setBounds(10, y, 160, 30);
+                estilizarCampo(txtDataCompra);
+
+                JTextField txtFuncionario = new JTextField(funcionarioNome);
+                txtFuncionario.setBounds(180, y, 120, 30);
+                estilizarCampo(txtFuncionario);
+
+                JTextField txtTipoCliente = new JTextField(tipoCliente);
+                txtTipoCliente.setBounds(310, y, 100, 30);
+                estilizarCampo(txtTipoCliente);
+
+                JTextField txtFormaPagamento = new JTextField(formaPagamento);
+                txtFormaPagamento.setBounds(420, y, 80, 30);
+                estilizarCampo(txtFormaPagamento);
+
+                JTextField txtDesconto = new JTextField(desconto);
+                txtDesconto.setBounds(510, y, 50, 30);
+                estilizarCampo(txtDesconto);
+
+                JTextField txtValorTotal = new JTextField("R$ "+valorTotal);
+                txtValorTotal.setBounds(570, y, 80, 30);
+                estilizarCampo(txtValorTotal);
+
+                JButton btnVisualizar = new JButton("Ver");
+                btnVisualizar.setBounds(660, y, 80, 30);
+                estilizarBotao(btnVisualizar);
+                btnVisualizar.addActionListener(e -> {
+                    TelaHistoricoCompra telaHistoricoCompra = mainApp.getTelaHistoricoCompra();
+                    telaHistoricoCompra.campoFuncionario.setText(funcionarioNome);
+                    telaHistoricoCompra.campoTipocliente.setText(tipoCliente);
+                    telaHistoricoCompra.campoFormaDePagamento.setText(formaPagamento);
+                    telaHistoricoCompra.campoDesconto.setText(desconto);
+                    telaHistoricoCompra.campoTotalDaCompra.setText("R$ "+valorTotal);
+                    telaHistoricoCompra.carregarProdutosPorCompra(compraId);
+                    mainApp.exibirTela(telaHistoricoCompra);
+                });
+
+                painel.add(txtDataCompra);
+                painel.add(txtFuncionario);
+                painel.add(txtTipoCliente);
+                painel.add(txtFormaPagamento);
+                painel.add(txtDesconto);
+                painel.add(txtValorTotal);
+                painel.add(btnVisualizar);
+
+                y += 40;
+            }
+            campoTotalDasCompras.setText(String.format("R$ "+"%.2f", total));
+            painel.revalidate();
+            painel.repaint();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-
-        ResultSet rs = stmt.executeQuery();
-        int y = 10;
-        double total = 0;
-
-        while (rs.next()) {
-            int compraId = rs.getInt("compra_id");
-            String dataCompra = rs.getString("data_compra");
-            String funcionarioNome = rs.getString("funcionario");
-            String tipoCliente = rs.getString("tipo_cliente");
-            String formaPagamento = rs.getString("forma_pagamento");
-            String desconto = rs.getString("desconto");
-            String valorTotal = rs.getString("valor_total");
-            total += Double.parseDouble(valorTotal);
-
-            JTextField txtDataCompra = new JTextField(dataCompra);
-            txtDataCompra.setBounds(10, y, 160, 30);
-            estilizarCampo(txtDataCompra);
-
-            JTextField txtFuncionario = new JTextField(funcionarioNome);
-            txtFuncionario.setBounds(180, y, 120, 30);
-            estilizarCampo(txtFuncionario);
-
-            JTextField txtTipoCliente = new JTextField(tipoCliente);
-            txtTipoCliente.setBounds(310, y, 100, 30);
-            estilizarCampo(txtTipoCliente);
-
-            JTextField txtFormaPagamento = new JTextField(formaPagamento);
-            txtFormaPagamento.setBounds(420, y, 80, 30);
-            estilizarCampo(txtFormaPagamento);
-
-            JTextField txtDesconto = new JTextField(desconto);
-            txtDesconto.setBounds(510, y, 50, 30);
-            estilizarCampo(txtDesconto);
-
-            JTextField txtValorTotal = new JTextField(valorTotal);
-            txtValorTotal.setBounds(570, y, 60, 30);
-            estilizarCampo(txtValorTotal);
-
-            JButton btnVisualizar = new JButton("Visualizar");
-            btnVisualizar.setBounds(640, y, 110, 30);
-            estilizarBotao(btnVisualizar);
-            btnVisualizar.addActionListener(e -> {
-                TelaHistoricoCompra telaHistoricoCompra = mainApp.getTelaHistoricoCompra();
-                telaHistoricoCompra.campoFuncionario.setText(funcionarioNome);
-                telaHistoricoCompra.campoTipocliente.setText(tipoCliente);
-                telaHistoricoCompra.campoFormaDePagamento.setText(formaPagamento);
-                telaHistoricoCompra.campoDesconto.setText(desconto);
-                telaHistoricoCompra.campoTotalDaCompra.setText(valorTotal);
-                telaHistoricoCompra.carregarProdutosPorCompra(compraId);
-                mainApp.exibirTela(telaHistoricoCompra);
-            });
-
-            painel.add(txtDataCompra);
-            painel.add(txtFuncionario);
-            painel.add(txtTipoCliente);
-            painel.add(txtFormaPagamento);
-            painel.add(txtDesconto);
-            painel.add(txtValorTotal);
-            painel.add(btnVisualizar);
-
-            y += 40;
-        }
-        campoTotalDasCompras.setText(String.format("%.2f", total));
-        painel.revalidate();
-        painel.repaint();
-    } catch (SQLException e) {
-        e.printStackTrace();
     }
-}
 
     private LocalDateTime obterDataDoCampo(JTextField campo) {
         try {

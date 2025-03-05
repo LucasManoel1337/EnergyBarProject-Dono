@@ -12,7 +12,6 @@ energy\bar\TelaHistoricoCompra.class
 energy\bar\support\IdFilter.class
 energy\bar\BotaoPersonalizado.class
 energy\bar\TelaGerenciarFuncionarios$1.class
-energy\bar\db\GeradorDeProdutos.class
 energy\bar\support\ValueFilter.class
 energy\bar\TelaGerenciarUnidades.class
 energy\bar\back\dto\ProdutoDTO.class
