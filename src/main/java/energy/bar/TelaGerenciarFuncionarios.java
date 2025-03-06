@@ -2,6 +2,7 @@ package energy.bar;
 
 import energy.bar.db.ConexaoBancoDeDados;
 import energy.bar.support.LabelEnergyBar;
+import energy.bar.support.UnidadeService;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -12,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -32,6 +34,7 @@ class TelaGerenciarFuncionarios extends JPanel {
     DefaultTableModel modeloTabela = new DefaultTableModel(colunas, 0);
     public JTable tabelaFuncionarios = new JTable(modeloTabela);
     JTextField campoInativarAtivar = new JTextField();
+    public JComboBox<String> campoUnidade = new JComboBox<>(UnidadeService.getUnidadesIds().toArray(new String[0]));
 
     public TelaGerenciarFuncionarios() {
         setLayout(null);
@@ -138,29 +141,10 @@ class TelaGerenciarFuncionarios extends JPanel {
                 bInativarAtivarActionPerformed(e);
             }
         });
-
-// Criando um ArrayList para armazenar os IDs das unidades
-        ArrayList<String> unidadesIds = new ArrayList<>();
-
-        try (Connection conn = ConexaoBancoDeDados.getConnection()) {
-            String query = "SELECT id FROM tb_unidades";
-            try (PreparedStatement stmt = conn.prepareStatement(query)) {
-                ResultSet rs = stmt.executeQuery();
-
-                // Adiciona os IDs das unidades ao ArrayList
-                while (rs.next()) {
-                    int id = rs.getInt("id");
-                    unidadesIds.add(String.valueOf(id));
-                }
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
+        
+        carregarUnidades();
 
 // Converte o ArrayList para um array e preenche o JComboBox
-        String[] responsaveis = unidadesIds.toArray(new String[0]);
-
-        JComboBox<String> campoUnidade = new JComboBox<>(responsaveis);
         campoUnidade.setBounds(420, 150, 200, 30);
         campoUnidade.setBackground(Color.LIGHT_GRAY);
         campoUnidade.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
@@ -223,6 +207,15 @@ class TelaGerenciarFuncionarios extends JPanel {
         });
     }
 
+    public void carregarUnidades() {
+        UnidadeService.atualizarUnidadesIds(); // Atualiza a lista antes de carregar
+
+        DefaultComboBoxModel<String> modelo = new DefaultComboBoxModel<>(
+                UnidadeService.getUnidadesIds().toArray(new String[0])
+        );
+
+        campoUnidade.setModel(modelo); // Atualiza os itens do JComboBox
+    }
     private void bInativarAtivarActionPerformed(java.awt.event.ActionEvent evt) {
         String idTexto = campoInativarAtivar.getText().trim();
 

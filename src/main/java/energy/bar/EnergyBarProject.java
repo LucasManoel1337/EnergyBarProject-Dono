@@ -191,10 +191,12 @@ public class EnergyBarProject {
             telaSaidas.carregarUnidades();
         } if (novaTela instanceof TelaGerenciarFuncionarios) {
             telaGerenciarFuncionarios.atualizarTabelaFuncionarios();
+            telaGerenciarFuncionarios.carregarUnidades();
         } if (novaTela instanceof TelaGerenciarUnidades) {
             telaGerenciarUnidades.atualizarTabelaUnidades();
         } if (novaTela instanceof TelaRelatorios) {
             telaRelatorios.carregarTodosProdutos();
+            telaRelatorios.carregarUnidades();
         }
     }
 

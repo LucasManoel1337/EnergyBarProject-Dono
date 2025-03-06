@@ -14,6 +14,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import energy.bar.support.QuantidadeCellRenderer;
+import energy.bar.support.UnidadeService;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.SQLException;
@@ -41,7 +42,9 @@ class TelaRelatorios extends JPanel {
 
     private JTextField campoDataInicio = new JTextField();
     private JTextField campoDataFim = new JTextField();
-    public JComboBox<String> campoUnidade;
+    public JComboBox<String> campoUnidade = new JComboBox<>(UnidadeService.getUnidadesIds().toArray(new String[0]));
+
+    public int unidadeDoProgama;
 
     public TelaRelatorios() {
         setLayout(null);
@@ -104,7 +107,7 @@ class TelaRelatorios extends JPanel {
         tabelaProdutos.getColumnModel().getColumn(3).setPreferredWidth(70);
 
         carregarTodosProdutos();
-        
+
         JLabel lDataInicio = new JLabel("Data inicio");
         lDataInicio.setFont(new Font("Arial", Font.BOLD, 16));
         lDataInicio.setBounds(10, 40, 120, 30);
@@ -124,10 +127,10 @@ class TelaRelatorios extends JPanel {
         campoDataFim.setEditable(true);
         adicionarPlaceholder(campoDataFim, "DD-MM-YYYY");
         add(campoDataFim);
-        
+
         // Criando o JComboBox para as unidades
         carregarUnidades();
-        
+
         JLabel lUnidade = new JLabel("Unidade");
         lUnidade.setFont(new Font("Arial", Font.BOLD, 16));
         lUnidade.setBounds(270, 40, 120, 30);
@@ -137,7 +140,7 @@ class TelaRelatorios extends JPanel {
         campoUnidade.setFont(new Font("Arial", Font.BOLD, 16));
         campoUnidade.setFocusable(false);
         add(campoUnidade);
-        
+
         JButton btnAtualizar = new JButton("Filtrar");
         btnAtualizar.setBounds(330, 65, 100, 30);
         //btnAtualizar.addActionListener(e -> atualizarListaArquivos());
@@ -168,28 +171,16 @@ class TelaRelatorios extends JPanel {
         botao.setFocusPainted(false);
         botao.setBorderPainted(false);
     }
-    
+
     public void carregarUnidades() {
-    try (Connection conn = ConexaoBancoDeDados.getConnection()) {
-        String query = "SELECT id FROM tb_unidades";
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            ResultSet rs = stmt.executeQuery();
+        UnidadeService.atualizarUnidadesIds(); // Atualiza a lista antes de carregar
 
-            while (rs.next()) {
-                int id = rs.getInt("id");
-                unidadesIds.add(String.valueOf(id));
-            }
-            
-            if (unidadesIds.isEmpty()) { //PROVISORIO
-                unidadesIds.add("0"); //PROVISORIO
-            } //PROVISORIO
-        }
-    } catch (SQLException ex) {
-        ex.printStackTrace();
+        DefaultComboBoxModel<String> modelo = new DefaultComboBoxModel<>(
+                UnidadeService.getUnidadesIds().toArray(new String[0])
+        );
+
+        campoUnidade.setModel(modelo); // Atualiza os itens do JComboBox
     }
-
-    campoUnidade = new JComboBox<>(unidadesIds.toArray(new String[0]));
-}
 
     private void adicionarPlaceholder(JTextField campo, String textoPlaceholder) {
         campo.setText(textoPlaceholder);

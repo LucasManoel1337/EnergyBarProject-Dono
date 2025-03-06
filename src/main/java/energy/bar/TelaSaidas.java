@@ -1,8 +1,8 @@
 package energy.bar;
 
-import energy.bar.back.dao.FuncionariosDAO;
 import energy.bar.db.ConexaoBancoDeDados;
 import energy.bar.support.LabelEnergyBar;
+import energy.bar.support.UnidadeService;
 import javax.swing.*;
 import java.awt.*;
 import java.sql.*;
@@ -14,7 +14,6 @@ import java.util.ArrayList;
 class TelaSaidas extends JPanel {
 
     private EnergyBarProject mainApp;
-    private FuncionariosDAO funcionario = new FuncionariosDAO();
     private JTextField campoDataInicio = new JTextField();
     private JTextField campoDataFim = new JTextField();
     private JTextField campoTotalDasCompras = new JTextField();
@@ -22,7 +21,9 @@ class TelaSaidas extends JPanel {
     private JPanel painelArquivos = new JPanel();
 
     private ArrayList<String> unidadesIds = new ArrayList<>();
-    public JComboBox<String> campoUnidade;
+    public JComboBox<String> campoUnidade = new JComboBox<>(UnidadeService.getUnidadesIds().toArray(new String[0]));
+
+    public int unidadeDoPrograma;
 
     public TelaSaidas(EnergyBarProject mainApp) {
         setLayout(null);
@@ -125,26 +126,14 @@ class TelaSaidas extends JPanel {
     }
 
     public void carregarUnidades() {
-    try (Connection conn = ConexaoBancoDeDados.getConnection()) {
-        String query = "SELECT id FROM tb_unidades";
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            ResultSet rs = stmt.executeQuery();
+        UnidadeService.atualizarUnidadesIds(); // Atualiza a lista antes de carregar
 
-            while (rs.next()) {
-                int id = rs.getInt("id");
-                unidadesIds.add(String.valueOf(id));
-            }
-            
-            if (unidadesIds.isEmpty()) { //PROVISORIO
-                unidadesIds.add("0"); //PROVISORIO
-            } //PROVISORIO
-        }
-    } catch (SQLException ex) {
-        ex.printStackTrace();
+        DefaultComboBoxModel<String> modelo = new DefaultComboBoxModel<>(
+                UnidadeService.getUnidadesIds().toArray(new String[0])
+        );
+
+        campoUnidade.setModel(modelo); // Atualiza os itens do JComboBox
     }
-
-    campoUnidade = new JComboBox<>(unidadesIds.toArray(new String[0]));
-}
 
     private void adicionarPlaceholder(JTextField campo, String textoPlaceholder) {
         campo.setText(textoPlaceholder);
@@ -184,7 +173,10 @@ class TelaSaidas extends JPanel {
 
             LocalDateTime dataInicio = obterDataDoCampo(campoDataInicio);
             LocalDateTime dataFim = obterDataDoCampo(campoDataFim);
-            int unidadeDoPrograma = Integer.parseInt(campoUnidade.getSelectedItem().toString());
+
+            if (!unidadesIds.isEmpty()) {
+                unidadeDoPrograma = Integer.parseInt(campoUnidade.getSelectedItem().toString());
+            }
 
             // Verifica se as datas foram fornecidas e aplica o filtro
             if (dataInicio != null && dataFim != null) {
@@ -240,7 +232,7 @@ class TelaSaidas extends JPanel {
                 txtDesconto.setBounds(510, y, 50, 30);
                 estilizarCampo(txtDesconto);
 
-                JTextField txtValorTotal = new JTextField("R$ "+valorTotal);
+                JTextField txtValorTotal = new JTextField("R$ " + valorTotal);
                 txtValorTotal.setBounds(570, y, 80, 30);
                 estilizarCampo(txtValorTotal);
 
@@ -253,7 +245,7 @@ class TelaSaidas extends JPanel {
                     telaHistoricoCompra.campoTipocliente.setText(tipoCliente);
                     telaHistoricoCompra.campoFormaDePagamento.setText(formaPagamento);
                     telaHistoricoCompra.campoDesconto.setText(desconto);
-                    telaHistoricoCompra.campoTotalDaCompra.setText("R$ "+valorTotal);
+                    telaHistoricoCompra.campoTotalDaCompra.setText("R$ " + valorTotal);
                     telaHistoricoCompra.carregarProdutosPorCompra(compraId);
                     mainApp.exibirTela(telaHistoricoCompra);
                 });
@@ -268,7 +260,7 @@ class TelaSaidas extends JPanel {
 
                 y += 40;
             }
-            campoTotalDasCompras.setText(String.format("R$ "+"%.2f", total));
+            campoTotalDasCompras.setText(String.format("R$ " + "%.2f", total));
             painel.revalidate();
             painel.repaint();
         } catch (SQLException e) {

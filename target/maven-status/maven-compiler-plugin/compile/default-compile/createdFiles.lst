@@ -24,6 +24,7 @@ energy\bar\back\dao\ProdutoDAO.class
 energy\bar\back\dto\ProdutoCompraDTO.class
 energy\bar\back\dao\FuncionariosDAO.class
 energy\bar\support\LabelEnergyBar.class
+energy\bar\support\UnidadeService.class
 energy\bar\db\GerenciadorDeProdutos.class
 energy\bar\back\dto\FuncionarioDTO.class
 energy\bar\support\IdVerifier.class
