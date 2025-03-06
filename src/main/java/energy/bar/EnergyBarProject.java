@@ -21,7 +21,7 @@ import javax.swing.JOptionPane;
 
 public class EnergyBarProject {
     
-    private String versaoPrograma = "0.8.9";
+    private String versaoPrograma = "0.9.0";
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss - dd-MM-yyyy");
     String dataHoraAtual = LocalDateTime.now().format(formatter);

@@ -14,9 +14,9 @@ import java.time.format.DateTimeFormatter;
 
 public class ConexaoBancoDeDados {
 
-    private static final String URL = "jdbc:mysql://localhost:3306/energybar";
-    private static final String USUARIO = "root";
-    private static final String SENHA = "admin";
+    private static final String URL = "jdbc:mysql://u941_OXb1SvXa7b:wrvtiMNa%3Ddmj%40%40PO5EoE%40nWG@181.215.45.73:3306/s941_energybar_desenvolvimento";
+    private static final String USUARIO = "u941_OXb1SvXa7b";
+    private static final String SENHA = "wrvtiMNa=dmj@@PO5EoE@nWG";
     
     // Formatar data e hora atual
        public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss - dd-MM-yyyy");
