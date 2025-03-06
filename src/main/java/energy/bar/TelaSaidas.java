@@ -174,8 +174,14 @@ class TelaSaidas extends JPanel {
             LocalDateTime dataInicio = obterDataDoCampo(campoDataInicio);
             LocalDateTime dataFim = obterDataDoCampo(campoDataFim);
 
-            if (!unidadesIds.isEmpty()) {
+            int unidadeDoPrograma = 0; // Certifique-se de declarar a variável
+
+            // Verifica se o JComboBox possui itens e se o item selecionado não é nulo
+            if (campoUnidade.getItemCount() > 0 && campoUnidade.getSelectedItem() != null) {
                 unidadeDoPrograma = Integer.parseInt(campoUnidade.getSelectedItem().toString());
+            } else {
+                System.out.println("O JComboBox está vazio ou nenhum item foi selecionado.");
+                // Opcional: defina um valor padrão ou interrompa a execução
             }
 
             // Verifica se as datas foram fornecidas e aplica o filtro
