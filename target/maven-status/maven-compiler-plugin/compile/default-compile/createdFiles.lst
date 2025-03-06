@@ -15,6 +15,7 @@ energy\bar\TelaGerenciarFuncionarios$1.class
 energy\bar\support\ValueFilter.class
 energy\bar\TelaGerenciarUnidades.class
 energy\bar\back\dto\ProdutoDTO.class
+energy\bar\TelaRelatorios$1.class
 energy\bar\support\QuantidadeCellRenderer.class
 energy\bar\TelaSaidas.class
 energy\bar\support\EstoqueVerifier.class
